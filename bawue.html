@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Observable Embed – chartCK</title>
+  <title>chartCK</title>
   <style>
     body{
       margin:0;
@@ -11,75 +11,43 @@
       background:#f6f6f6;
       color:#111;
     }
-    .wrap{ max-width: 800px; margin: 0 auto; padding: 24px 16px; }
+    .wrap{
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 16px;
+    }
     .card{
       background:#fff;
       border-radius:14px;
       box-shadow: 0 6px 20px rgba(0,0,0,.08);
-      padding: 0;           /* iframe bündig */
-      overflow:hidden;      /* runde Ecken fürs iframe */
+      overflow:hidden;
     }
     iframe{
       width:100%;
       border:0;
-      display:block;        /* verhindert “Gap” unten */
+      display:block;
+      /* Mobile: nicht “zu hoch” starten, aber groß genug */
+      min-height: 70vh;
+      height: 1184px; /* fallback */
+    }
+
+    /* Optional: auf sehr kleinen Screens etwas weniger Außenrand */
+    @media (max-width: 480px){
+      .wrap{ padding: 8px; }
+      .card{ border-radius: 10px; }
+      iframe{ min-height: 75vh; }
     }
   </style>
 </head>
 <body>
   <div class="wrap">
     <div class="card">
-      <iframe id="obs"
+      <iframe
         src="https://observablehq.com/embed/214f794c4e23040b?cells=chartCK"
         loading="lazy"
         allow="fullscreen"
-        referrerpolicy="no-referrer-when-downgrade"
-        height="1184"
       ></iframe>
     </div>
   </div>
-
-  <script>
-    (function () {
-      const iframe = document.getElementById("obs");
-
-      function setHeightFromContent() {
-        try {
-          // Wird nur funktionieren, wenn der Browser den Zugriff erlaubt (CORS/Same-Origin).
-          const doc = iframe.contentDocument || iframe.contentWindow.document;
-          if (!doc) return;
-
-          const h =
-            Math.max(
-              doc.body?.scrollHeight || 0,
-              doc.documentElement?.scrollHeight || 0,
-              doc.body?.offsetHeight || 0,
-              doc.documentElement?.offsetHeight || 0
-            ) + 8; // kleiner Puffer
-
-          if (h > 0) iframe.style.height = h + "px";
-        } catch (e) {
-          // Falls Cross-Origin blockt: fallback -> fixe Höhe beibehalten
-        }
-      }
-
-      // Beim Laden einmal versuchen
-      iframe.addEventListener("load", () => {
-        setHeightFromContent();
-        // Observable kann nachträglich Layout ändern (Fonts, async data).
-        // Deshalb kurz nachpollen.
-        let n = 0;
-        const t = setInterval(() => {
-          setHeightFromContent();
-          if (++n > 20) clearInterval(t); // ~10s bei 500ms
-        }, 500);
-      });
-
-      // Bei Fenster-Resize erneut versuchen
-      window.addEventListener("resize", () => {
-        setHeightFromContent();
-      });
-    })();
-  </script>
 </body>
 </html>
